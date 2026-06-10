@@ -1068,11 +1068,11 @@ async function dlReport() {
       doc.addPage();y=20;
       if((r.keyPatterns||[]).length){
         doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(10,10,15);doc.text('Key Patterns Identified',15,y);y+=8;
-        (r.keyPatterns||[]).forEach(p=>{const l=doc.splitTextToSize('→ '+p,180);doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(79,127,224);doc.text(l,15,y);y+=l.length*5+2;});y+=4;
+        (r.keyPatterns||[]).forEach(p=>{const l=doc.splitTextToSize('- '+p,180);doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(79,127,224);doc.text(l,15,y);y+=l.length*5+2;});y+=4;
       }
       if((r.redFlags||[]).length){
-        doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(193,18,31);doc.text('⚠ Red Flags Requiring Urgent Attention',15,y);y+=8;
-        (r.redFlags||[]).forEach(f=>{const l=doc.splitTextToSize('! '+f,180);doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(193,18,31);doc.text(l,15,y);y+=l.length*5+2;});y+=4;
+        doc.setFontSize(13);doc.setFont('helvetica','bold');doc.setTextColor(193,18,31);doc.text('Red Flags Requiring Urgent Attention',15,y);y+=8;
+        (r.redFlags||[]).forEach(f=>{const l=doc.splitTextToSize('* '+f,180);doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(193,18,31);doc.text(l,15,y);y+=l.length*5+2;});y+=4;
       }
 
       // ACTION PLAN
@@ -1082,7 +1082,7 @@ async function dlReport() {
       // ALGORITHM TRANSPARENCY
       doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor(10,10,15);doc.text('Algorithm Transparency (For Clinician Review)',15,y);y+=6;
       doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(107,114,128);
-      const algoText2='SCM Confidence Formula: conf = (matched_markers / total_markers) × (1 − gap_penalty). Gap penalty 0.0–0.4 based on critical tests not completed. Exclusionary markers collapse confidence to 0.0 via f(E) = Π(1 − eᵢ). Inspired by Framingham Risk Score methodology. Outputs are for informational and wellness purposes only. Not FDA-cleared. Not a substitute for clinical judgment.';
+      const algoText2='SCM Confidence Formula: conf = (matched_markers / total_markers) x (1 - gap_penalty). Gap penalty 0.0 to 0.4 based on critical tests not completed. Exclusionary markers collapse confidence to 0.0 via f(E) = product(1 - e_q). Inspired by Framingham Risk Score methodology. Outputs are for informational and wellness purposes only. Not FDA-cleared. Not a substitute for clinical judgment.';
       const algoLines2=doc.splitTextToSize(algoText2,180);doc.text(algoLines2,15,y);
     } else {
       doc.setFontSize(16);doc.setFont('helvetica','bold');doc.setTextColor(10,10,15);doc.text('DFRS: '+r.riskScore+'/10 — '+r.riskLevel,15,y);y+=8;
@@ -1155,7 +1155,7 @@ async function dlReport() {
       // ALGORITHM TRANSPARENCY
       doc.setFontSize(11);doc.setFont('helvetica','bold');doc.setTextColor(10,10,15);doc.text('Algorithm Transparency (For Clinician Review)',15,y);y+=6;
       doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(107,114,128);
-      const algoText='DFRS uses a weighted multi-factor scoring model inspired by the Framingham Risk Score. Inputs: Symptom Severity Trajectory (×2.5), Pain (×1.8), Stress Index (×1.5), Fatigue (×1.2), Sleep Quality Deviation, Medication Adherence, Environmental Factors (barometric pressure, humidity, temperature), and Condition-Specific Biomarker Proxies. All outputs are for informational and wellness purposes only. DFRS is not FDA-cleared. Not a substitute for clinical judgment.';
+      const algoText='DFRS uses a weighted multi-factor scoring model inspired by the Framingham Risk Score. Inputs: Symptom Severity Trajectory (x2.5), Pain (x1.8), Stress Index (x1.5), Fatigue (x1.2), Sleep Quality Deviation, Medication Adherence, Environmental Factors (barometric pressure, humidity, temperature), and Condition-Specific Biomarker Proxies. All outputs are for informational and wellness purposes only. DFRS is not FDA-cleared. Not a substitute for clinical judgment.';
       const algoLines=doc.splitTextToSize(algoText,180);doc.text(algoLines,15,y);
     }
     const pg=doc.internal.getNumberOfPages();
