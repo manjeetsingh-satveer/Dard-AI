@@ -29,11 +29,52 @@ export default async function handler(req, res) {
       return res.status(anthropicResponse.status).json({ error: raw });
     }
     const data = JSON.parse(raw);
-    const text = data.content?.[0]?.text?.replace(/```json|```/g, '').trim();
+    let text = data.content?.[0]?.text?.trim();
     if (!text) {
       return res.status(500).json({ error: 'No response text from Anthropic' });
     }
-    return res.status(200).json({ result: JSON.parse(text) });
+
+    // Strip markdown code fences if present
+    text = text.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
+
+    // Extract just the JSON object/array in case there's any stray text before/after
+    const firstBrace = text.indexOf('{');
+    const firstBracket = text.indexOf('[');
+    let start = -1;
+    if (firstBrace === -1) start = firstBracket;
+    else if (firstBracket === -1) start = firstBrace;
+    else start = Math.min(firstBrace, firstBracket);
+
+    if (start > 0) {
+      text = text.slice(start);
+    }
+
+    const lastBrace = text.lastIndexOf('}');
+    const lastBracket = text.lastIndexOf(']');
+    const end = Math.max(lastBrace, lastBracket);
+    if (end !== -1 && end < text.length - 1) {
+      text = text.slice(0, end + 1);
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(text);
+    } catch (parseErr) {
+      // Attempt a repair pass: strip stray control chars and escape lone backslashes, then retry once
+      try {
+        const repaired = text
+          .replace(/[\u0000-\u0009\u000B-\u001F]/g, ' ')
+          .replace(/\\(?!["\\/bfnrtu])/g, '\\\\');
+        parsed = JSON.parse(repaired);
+      } catch (repairErr) {
+        return res.status(500).json({
+          error: `Failed to parse AI response as JSON: ${parseErr.message}`,
+          rawSnippet: text.slice(0, 500)
+        });
+      }
+    }
+
+    return res.status(200).json({ result: parsed });
   } catch (error) {
     return res.status(500).json({ error: error.message || 'Server error' });
   }
