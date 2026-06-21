@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 2500,
+        max_tokens: 4096,
         messages: [{ role: 'user', content: prompt }]
       })
     });
@@ -29,6 +29,13 @@ export default async function handler(req, res) {
       return res.status(anthropicResponse.status).json({ error: raw });
     }
     const data = JSON.parse(raw);
+
+    if (data.stop_reason === 'max_tokens') {
+      return res.status(500).json({
+        error: 'AI response was cut off because it exceeded the token limit. Try shortening your input, or increase max_tokens in api/analyze.js.'
+      });
+    }
+
     let text = data.content?.[0]?.text?.trim();
     if (!text) {
       return res.status(500).json({ error: 'No response text from Anthropic' });
